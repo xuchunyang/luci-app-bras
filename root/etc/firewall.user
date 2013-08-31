@@ -1,0 +1,7 @@
+# This file is interpreted as shell script.
+# Put your custom iptables rules here, they will
+# be executed with each firewall (re-)start.
+iptables -A forwarding_rule -i ppp0 -o br-lan -j ACCEPT 
+iptables -A forwarding_rule -i br-lan -o ppp0 -j ACCEPT
+iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -o ppp0 -j MASQUERADE
+#iptables -A zone_vpn_MSSFIX -o ppp0 -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu

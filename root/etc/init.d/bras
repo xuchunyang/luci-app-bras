@@ -31,6 +31,24 @@ bras_conf() {
 
 }
 
+# 在 pppd 不改变路由的情况下 #TODO: 总是这样吗？ 路由表的更新到底收到那些因素影响？
+update_route_table() {
+    echo "updating route table..."
+    # 获取拨号以前的的网关
+    set $(route -e | grep default) # TODO:使用 awk 或 sed 更自然
+    orig_gateway=$2
+
+    # 首先，添加 bras.seu.edu.cn 到 非ppp0 的网络接口。bras.seu.edu.cn 有两
+    # 个IP, 这里本应该添加分配的IP，xl2tpd -D 可以看到是哪个IP
+    route add -net 58.192.112.38 netmask 255.255.255.255 gw $orig_gateway
+    route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
+    # 之后，才能修改改默认路由 (default route)
+    route del -net default
+    route add -net default dev ppp0 # 所有网路请求，默认使用 ppp0 口
+    # 最后，添加校内路由表 # TODO: 以 bbs.seu.edu.cn 为例,需要补全
+    route add -net 58.192.114.8 netmask 255.255.255.255 gw $orig_gateway
+}
+
 start()
 {
     config_load bras
@@ -38,10 +56,9 @@ start()
 
     echo "starting xl2tpd..."
     [ -d $RUN_DIR ] || mkdir -p $xl2tpd_run_dir
-    # # TODO: 根据输入修改配置文件
     xl2tpd -c $xl2tpd_config_file  &> /dev/null &
 
-    # sleep 2
+    sleep 1
 
     pgrep xl2tpd > /dev/null
     if [ $? != 0 ]; then
@@ -51,12 +68,15 @@ start()
         exit 255
     fi
 
-    # sleep 3
-    # # TODO: check ppp0 active
-
-    # # TODO: 修改路由表
-
-    # # TODO: 网络端口转发
+    sleep 3
+    ifconfig ppp0 > /dev/null
+    if [ $? != 0 ]; then
+        update_route_table()
+    else
+        echo "xl2tpd is running , but Bras start failed!"
+        exit 255
+    fi
+    # TODO: 网络端口转发, iptable, /etc/firewall.user
 }
 
 stop()
