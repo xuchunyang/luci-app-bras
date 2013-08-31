@@ -1,0 +1,66 @@
+#!/bin/sh /etc/rc.common
+
+. /etc/functions.sh
+
+START=60
+STOP=01
+
+xl2tpd_run_dir=/var/run/xl2tpd
+
+xl2tpd_config_file=/etc/xl2tpd/bras.xl2tpd.conf
+ppp_option_file=/etc/ppp/options.bras.xl2tpd
+ppp_secret_file=/etc/ppp/chap-secrets
+
+bras_conf() {
+    echo "starting config xl2tpd..."
+    config_get username $1 username
+    config_get password $1 password
+
+    #Only for debug!
+    echo $username
+    echo $password
+
+    sed -e "s#|USERNAME|#$username" \
+        /etc/xl2tpd/xl2tpd.conf.template > $xl2tpd_config_file
+
+    [ -f /etc/ppp/options.bras.xl2tpd ] || echo "Error, ppp-opt filecopied failed!"
+
+    sed -e "s#|USERNAME|#$username" \
+        -e "s#|PASSWORD||#$password" \
+        /etc/ppp/chap-secrets.template > $ppp_secret_file
+
+}
+
+start()
+{
+    config_load bras
+    config_foreach bras_conf bras
+
+    echo "starting xl2tpd..."
+    [ -d $RUN_DIR ] || mkdir -p $xl2tpd_run_dir
+    # # TODO: 根据输入修改配置文件
+    xl2tpd -c $xl2tpd_config_file  &> /dev/null &
+
+    # sleep 2
+
+    pgrep xl2tpd > /dev/null
+    if [ $? != 0 ]; then
+        echo 'c bras' > $xl2tpd_run_dir/l2tp-control
+    else
+        echo 'xl2tpd already running'
+        exit 255
+    fi
+
+    # sleep 3
+    # # TODO: check ppp0 active
+
+    # # TODO: 修改路由表
+
+    # # TODO: 网络端口转发
+}
+
+stop()
+{
+    echo "stopping"
+    pkill -9 xl2tpd
+}
