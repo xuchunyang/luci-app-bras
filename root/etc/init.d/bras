@@ -2,7 +2,7 @@
 # LuCI-app-Bras
 # Maintainer: xcy <xuchunyang56@gmail.com>
 
-. /etc/functions.sh
+. /etc/functions.sh             # 导入函数config_*，比如config_get
 
 START=60
 STOP=01
@@ -13,18 +13,14 @@ xl2tpd_config_file=/etc/xl2tpd/bras.xl2tpd.conf
 ppp_option_file=/etc/ppp/options.bras.xl2tpd
 ppp_secret_file=/etc/ppp/chap-secrets
 
-# 获取成功连上PPPoE之后、拨Bras之前的网关
-set $(route -e | grep default) # TODO:使用 awk 或 sed 更自然
-orig_gateway=$2
-
 create_bras_conf() {
     echo "starting config xl2tpd..."
     config_get username $1 username
     config_get password $1 password
 
     #Only for debug!
-    echo $username
-    echo $password
+    echo "Your Username: ${username}"
+    echo "Your password: ${password}"
 
     sed -e "s#|USERNAME|#$username#g" \
         /etc/xl2tpd/xl2tpd.conf.template > $xl2tpd_config_file
@@ -41,18 +37,17 @@ create_bras_conf() {
 
 # 在 pppd 不改变路由的情况下 #TODO: 总是这样吗？ 路由表的更新到底受到到哪些因素影响？
 update_route_table() {
-    echo "updating route table..."
+    echo "Updating route table..."
 
+    orig_gateway=`cat /tmp/ORIG_GATEWAY`
     # 首先，添加 bras.seu.edu.cn 到 非ppp0 的网络接口。bras.seu.edu.cn 有两
     # 个IP, 这里本应该添加分配的IP，xl2tpd -D 可以看到是哪个IP
     route add -net 58.192.112.38 netmask 255.255.255.255 gw $orig_gateway
     route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
     # 之后，才能修改改默认路由 (default route)
     route del -net default
-    route add -net default dev ppp0 # 所有网路请求，默认使用 ppp0 口
-    if [ $? == 0 ]; then
-        touch /tmp/route_add_ppp0_done
-    fi
+    route add -net default dev ppp0 || echo "Error: add ppp0 as default route failed!" # 所有网路请求，默认使用 ppp0 口
+
     # 最后，添加校内路由表
     route add -net 58.192.114.8  netmask 255.255.255.255 gw $orig_gateway
     route add -net 10.0.0.0      netmask 255.0.0.0       gw $orig_gateway
@@ -60,11 +55,11 @@ update_route_table() {
     route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
     route add -net 121.229.0.0   netmask 255.255.0.0     gw $orig_gateway
     route add -net 121.248.48.0  netmask 255.255.240.0   gw $orig_gateway
-    route add -net 121.249.0.0   netmask 255.255.244.0   gw $orig_gateway
     route add -net 202.119.24.55 netmask 255.255.255.255 gw $orig_gateway
-    route add -net 202.119.114.0 netmask 255.255.240.0   gw $orig_gateway
     route add -net 211.65.32.0   netmask 255.255.224.0   gw $orig_gateway
     route add -net 211.65.232.0  netmask 255.255.252.0   gw $orig_gateway
+
+    echo "Updating route table done!"
 }
 
 start()
@@ -72,33 +67,40 @@ start()
     config_load bras
     config_foreach create_bras_conf
 
+    # 获取成功连上PPPoE之后、拨Bras之前的网关
+    set $(route -e | grep default) # TODO:使用 awk 或 sed 更自然
+    orig_gateway=$2
+    echo $orig_gateway  > /tmp/ORIG_GATEWAY # Ugly! 保存初始网关
+
     echo "starting xl2tpd..."
     [ -d $xl2tpd_run_dir ] || mkdir -p $xl2tpd_run_dir
-    xl2tpd -c $xl2tpd_config_file -D  &> /dev/null &
-
+    xl2tpd -c $xl2tpd_config_file
     sleep 1
 
     pgrep xl2tpd > /dev/null
     if [ $? == 0 ]; then
+        echo "xl2tpd is running!"
         echo 'c bras' > $xl2tpd_run_dir/l2tp-control
     else
-        echo 'xl2tpd not running'
+        echo 'Error: xl2tpd not running!'
         exit 255
     fi
 
     sleep 4
     ifconfig ppp0 > /dev/null
-    if [ $? != 0 ]; then
+    if [ $? == 0 ]; then
+        echo "ppp0 is running!"
         update_route_table
     else
-        echo "xl2tpd is running , but Bras start failed!"
+        echo "Error: xl2tpd is running , but ppp start failed!"
         exit 255
     fi
 }
 
 stop()
 {
-    echo "stopping"
-    pkill -9 xl2tpd
-    route add -net default gw $orig_gateway
+    echo "Killing xl2tpd..."
+    pkill -9 xl2tpd && echo "xl2tpd is killed!"
+    orig_gateway=`cat /tmp/ORIG_GATEWAY`
+    route add -net default gw $orig_gateway && echo "Recover your default route done!"
 }

@@ -49,7 +49,7 @@ if pid == "" then
    start.inputstyle = "apply"
    function start.write(self, section)
       message = luci.util.exec("/etc/init.d/bras start 2>&1")
-      luci.util.exec("sleep 4")
+      luci.util.exec("sleep 2")
       luci.http.redirect(
          luci.dispatcher.build_url("admin", "services", "bras") .. "?message=" .. message
       )
@@ -59,7 +59,7 @@ else
    stop.inputstyle = "reset"
    function stop.write(self, section)
       luci.util.exec("/etc/init.d/bras stop")
-      luci.util.exec("sleep 4")
+      luci.util.exec("sleep 2")
       luci.http.redirect(
          luci.dispatcher.build_url("admin", "services", "bras")
       )
