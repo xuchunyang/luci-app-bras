@@ -1,4 +1,6 @@
 #!/bin/sh /etc/rc.common
+# LuCI-app-Bras
+# Maintainer: xcy <xuchunyang56@gmail.com>
 
 . /etc/functions.sh
 
@@ -11,7 +13,11 @@ xl2tpd_config_file=/etc/xl2tpd/bras.xl2tpd.conf
 ppp_option_file=/etc/ppp/options.bras.xl2tpd
 ppp_secret_file=/etc/ppp/chap-secrets
 
-bras_conf() {
+# 获取成功连上PPPoE之后、拨Bras之前的网关
+set $(route -e | grep default) # TODO:使用 awk 或 sed 更自然
+orig_gateway=$2
+
+create_bras_conf() {
     echo "starting config xl2tpd..."
     config_get username $1 username
     config_get password $1 password
@@ -33,12 +39,9 @@ bras_conf() {
 
 }
 
-# 在 pppd 不改变路由的情况下 #TODO: 总是这样吗？ 路由表的更新到底收到那些因素影响？
+# 在 pppd 不改变路由的情况下 #TODO: 总是这样吗？ 路由表的更新到底受到到哪些因素影响？
 update_route_table() {
     echo "updating route table..."
-    # 获取拨号以前的的网关
-    set $(route -e | grep default) # TODO:使用 awk 或 sed 更自然
-    orig_gateway=$2
 
     # 首先，添加 bras.seu.edu.cn 到 非ppp0 的网络接口。bras.seu.edu.cn 有两
     # 个IP, 这里本应该添加分配的IP，xl2tpd -D 可以看到是哪个IP
@@ -50,14 +53,24 @@ update_route_table() {
     if [ $? == 0 ]; then
         touch /tmp/route_add_ppp0_done
     fi
-    # 最后，添加校内路由表 # TODO: 以 bbs.seu.edu.cn 为例,需要补全
-    route add -net 58.192.114.8 netmask 255.255.255.255 gw $orig_gateway
+    # 最后，添加校内路由表
+    route add -net 58.192.114.8  netmask 255.255.255.255 gw $orig_gateway
+    route add -net 10.0.0.0      netmask 255.0.0.0       gw $orig_gateway
+    route add -net 58.192.112.0  netmask 255.255.240.0   gw $orig_gateway
+    route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
+    route add -net 121.229.0.0   netmask 255.255.0.0     gw $orig_gateway
+    route add -net 121.248.48.0  netmask 255.255.240.0   gw $orig_gateway
+    route add -net 121.249.0.0   netmask 255.255.244.0   gw $orig_gateway
+    route add -net 202.119.24.55 netmask 255.255.255.255 gw $orig_gateway
+    route add -net 202.119.114.0 netmask 255.255.240.0   gw $orig_gateway
+    route add -net 211.65.32.0   netmask 255.255.224.0   gw $orig_gateway
+    route add -net 211.65.232.0  netmask 255.255.252.0   gw $orig_gateway
 }
 
 start()
 {
     config_load bras
-    config_foreach bras_conf bras
+    config_foreach create_bras_conf
 
     echo "starting xl2tpd..."
     [ -d $xl2tpd_run_dir ] || mkdir -p $xl2tpd_run_dir
@@ -81,12 +94,11 @@ start()
         echo "xl2tpd is running , but Bras start failed!"
         exit 255
     fi
-    # TODO: 网络端口转发, iptable, /etc/firewall.user
 }
 
 stop()
 {
     echo "stopping"
     pkill -9 xl2tpd
-    #TODO: 恢复默认网关
+    route add -net default gw $orig_gateway
 }

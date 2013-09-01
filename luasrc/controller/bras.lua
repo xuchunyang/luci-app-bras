@@ -1,5 +1,5 @@
 --[[
-   LuCI-Bras-app
+   LuCI-app-Bras
    Maintainer: xcy <xuchunyang56@gmail.com>
 ]]--
 

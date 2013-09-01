@@ -3,5 +3,5 @@
 # be executed with each firewall (re-)start.
 iptables -A forwarding_rule -i ppp0 -o br-lan -j ACCEPT 
 iptables -A forwarding_rule -i br-lan -o ppp0 -j ACCEPT
-iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -o ppp0 -j MASQUERADE
-#iptables -A zone_vpn_MSSFIX -o ppp0 -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+# "192.168.1.0/24" 是路由器的 LAN 口的网域，在 OpenWrt Web 界面中 Administration »Network »Interfaces 下可以看到
+iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o ppp0 -j MASQUERADE

@@ -1,8 +1,7 @@
 --[[
-   LuCI-Bras-app
+   LuCI-app-Bras
    Maintainer: xcy <xuchunyang56@gmail.com>
 ]]--
-
 
 require("luci.tools.webadmin")
 
@@ -16,7 +15,6 @@ pw = s:option(Value, "password", translate("Password"))
 pw.password = true
 pw.default = "123456"
 
-
 local pid = luci.util.exec("/usr/bin/pgrep xl2tpd")
 local message = luci.http.formvalue("message")
 
@@ -26,7 +24,6 @@ function bras_process_status()
    if pid ~= "" then
       status = "xl2tpd is running with the PID " .. pid .. "and "
    end
-   -- TODO: Testing
    if nixio.fs.access("/etc/rc.d/60bras") then
       status = status .. "it's enabled on the startup"
    else
@@ -73,8 +70,7 @@ if nixio.fs.access("/etc/rc.d/S60bras") then
    disable = t:option(Button, "_disable", translate("Disable from startup"))
    disable.inputstyle = "remove"
    function disable.write(self, section)
-      -- TODO: not implemented
-      -- luci.util.exec("/etc/init.d/bras disable")
+      luci.util.exec("/etc/init.d/bras disable")
       luci.util.exec("sleep 1")
       luci.http.redirect(
          luci.dispatcher.build_url("admin", "services", "bras")
@@ -84,7 +80,7 @@ else
    enable = t:option(Button, "_enable", translate("Enable on startup"))
    enable.inputstyle = "apply"
    function enable.write(self, section)
-      -- luci.util.exec("/etc/init.d/bras enable")
+      luci.util.exec("/etc/init.d/bras enable")
       luci.util.exec("sleep 1")
       luci.http.redirect(
          luci.dispatcher.build_url("admin", "services", "bras")
