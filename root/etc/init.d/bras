@@ -95,6 +95,8 @@ start()
         echo "Error: xl2tpd is running , but ppp start failed!"
         exit 255
     fi
+    # baidu.com 与 GFW 同在
+    pint -W1 -c1 baidu.com 2> /dev/null && echo "SUCCEED!" #FIXME: looking for alternative
 }
 
 stop()
@@ -102,5 +104,5 @@ stop()
     echo "Killing xl2tpd..."
     pkill -9 xl2tpd && echo "xl2tpd is killed!"
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
-    route add -net default gw $orig_gateway && echo "Recover your default route done!"
+    route add -net default gw $orig_gateway && echo "Recovering default route done!"
 }

@@ -16,6 +16,7 @@ pw.password = true
 pw.default = "123456"
 
 local pid = luci.util.exec("/usr/bin/pgrep xl2tpd")
+local pppd_pid = luci.util.exec("/usr/bin/pgrep pppd")
 local message = luci.http.formvalue("message")
 
 function bras_process_status()
@@ -30,6 +31,9 @@ function bras_process_status()
       status = status .. "it's disabled on the startup"
    end
 
+   if pppd_pid ~= "" then
+      status = "pppd is running!"
+   end
    local status = { status=status, message=message }
    local table = { pid=status }
    return table
