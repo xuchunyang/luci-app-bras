@@ -1,3 +1,6 @@
+nodetach
+lock
+usepeerdns
+noipdefault
+nodefaultroute
 noauth
-defaultroute
-proxyarp

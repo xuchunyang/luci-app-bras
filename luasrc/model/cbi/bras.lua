@@ -61,7 +61,7 @@ else
    stop = t:option(Button, "_stop", translate("Stop"))
    stop.inputstyle = "reset"
    function stop.write(self, section)
-      -- luci.util.exec("/etc/init.d/vpnc stop")
+      luci.util.exec("/etc/init.d/bras stop")
       luci.util.exec("sleep 4")
       luci.http.redirect(
          luci.dispatcher.build_url("admin", "services", "bras")

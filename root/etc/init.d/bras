@@ -20,14 +20,16 @@ bras_conf() {
     echo $username
     echo $password
 
-    sed -e "s#|USERNAME|#$username" \
+    sed -e "s#|USERNAME|#$username#g" \
         /etc/xl2tpd/xl2tpd.conf.template > $xl2tpd_config_file
 
     [ -f /etc/ppp/options.bras.xl2tpd ] || echo "Error, ppp-opt filecopied failed!"
 
-    sed -e "s#|USERNAME|#$username" \
-        -e "s#|PASSWORD||#$password" \
+    sed -e "s#|USERNAME|#$username#g" \
+        -e "s#|PASSWORD|#$password#g" \
         /etc/ppp/chap-secrets.template > $ppp_secret_file
+
+    echo "config xl2tpd complete!"
 
 }
 
@@ -45,6 +47,9 @@ update_route_table() {
     # 之后，才能修改改默认路由 (default route)
     route del -net default
     route add -net default dev ppp0 # 所有网路请求，默认使用 ppp0 口
+    if [ $? == 0 ]; then
+        touch /tmp/route_add_ppp0_done
+    fi
     # 最后，添加校内路由表 # TODO: 以 bbs.seu.edu.cn 为例,需要补全
     route add -net 58.192.114.8 netmask 255.255.255.255 gw $orig_gateway
 }
@@ -55,23 +60,23 @@ start()
     config_foreach bras_conf bras
 
     echo "starting xl2tpd..."
-    [ -d $RUN_DIR ] || mkdir -p $xl2tpd_run_dir
-    xl2tpd -c $xl2tpd_config_file  &> /dev/null &
+    [ -d $xl2tpd_run_dir ] || mkdir -p $xl2tpd_run_dir
+    xl2tpd -c $xl2tpd_config_file -D  &> /dev/null &
 
     sleep 1
 
     pgrep xl2tpd > /dev/null
-    if [ $? != 0 ]; then
+    if [ $? == 0 ]; then
         echo 'c bras' > $xl2tpd_run_dir/l2tp-control
     else
-        echo 'xl2tpd already running'
+        echo 'xl2tpd not running'
         exit 255
     fi
 
-    sleep 3
+    sleep 4
     ifconfig ppp0 > /dev/null
     if [ $? != 0 ]; then
-        update_route_table()
+        update_route_table
     else
         echo "xl2tpd is running , but Bras start failed!"
         exit 255
@@ -83,4 +88,5 @@ stop()
 {
     echo "stopping"
     pkill -9 xl2tpd
+    #TODO: 恢复默认网关
 }
