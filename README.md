@@ -35,7 +35,8 @@ luci-app-Bras
 
 其他
 ----
-如果你在使用中遇到了任何问题，都可以到 [SBBS][4] 提问，也可以电邮我。我的邮箱: xuchunyang56@gmail.com
+如果你在使用中遇到了任何问题，都可以到 [SBBS][4] 的 Linux 版提问，也可以电邮我。
+我的邮箱: xuchunyang56@gmail.com
 
 [1]: http://en.wikipedia.org/wiki/Lua
 [2]: http://www.chiark.greenend.org.uk/~sgtatham/putty/
