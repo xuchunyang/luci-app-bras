@@ -31,9 +31,9 @@ luci-app-Bras
 
 首次安装之后需要重启路由器或者手动更新 `iptable` 。之后，使用浏览器登录路由器，进入 管理界面 -> 服务 -> BRAS。
 
-![Luci-app-Bras usage](https://raw.github.com/xuchunyang/luci-app-bras/master/image/luci-app-bras.png)
+![Luci-app-Bras usage](https://raw.github.com/xuchunyang/luci-app-bras/master/images/luci-app-bras.png)
 
-![Luci-app-Bras status](https://raw.github.com/xuchunyang/luci-app-bras/master/image/status.png)
+![Luci-app-Bras status](https://raw.github.com/xuchunyang/luci-app-bras/master/images/status.png)
 
 其他
 ----
