@@ -18,10 +18,6 @@ create_bras_conf() {
     config_get username $1 username
     config_get password $1 password
 
-    #Only for debug!
-    echo "Your Username: ${username}"
-    echo "Your password: ${password}"
-
     sed -e "s#|USERNAME|#$username#g" \
         /etc/xl2tpd/xl2tpd.conf.template > $xl2tpd_config_file
 

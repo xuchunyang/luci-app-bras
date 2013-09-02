@@ -28,7 +28,7 @@ function bras_process_status()
    if pid ~= "" then
       status = "xl2tpd is running with the PID " .. pid .. "and "
    else
-      status = 'Error xl2tpd is not running, Bras failed!'
+      status = 'xl2tpd is not running, Bras does not start!'
    end
    if nixio.fs.access("/etc/rc.d/60bras") then
       status = status .. "it's enabled on the startup"
@@ -39,7 +39,7 @@ function bras_process_status()
    if pppd_pid ~= "" then
       status = "Connected to Bras!"
    else
-      status = "pppd is not running, Bras failed! "
+      status = "pppd is not running, Bras does not start!"
    end
    local status = { status=status, message=message }
    local table = { pid=status }

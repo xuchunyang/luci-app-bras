@@ -31,12 +31,14 @@ luci-app-Bras
 
 首次安装之后需要重启路由器或者手动更新 `iptable` 。之后，使用浏览器登录路由器，进入 管理界面 -> 服务 -> BRAS。
 
-![Luci-app-Bras Web GUI](https://raw.github.com/xuchunyang/luci-app-bras/master/image/luci-app-bras.png)
+![Luci-app-Bras usage](https://raw.github.com/xuchunyang/luci-app-bras/master/image/luci-app-bras.png)
+
+![Luci-app-Bras status](https://raw.github.com/xuchunyang/luci-app-bras/master/image/status.png)
 
 其他
 ----
-如果你在使用中遇到了任何问题，都可以到 [SBBS][4] 的 Linux 版提问，也可以电邮我。
-我的邮箱: xuchunyang56@gmail.com
+如果你在使用中遇到了任何问题，都可以到 [SBBS][4] 的 Linux 版提问，
+也可以电邮我，我的邮箱: xuchunyang56@gmail.com
 
 [1]: http://en.wikipedia.org/wiki/Lua
 [2]: http://www.chiark.greenend.org.uk/~sgtatham/putty/
