@@ -41,21 +41,26 @@ update_route_table() {
     route add -net 58.192.112.38 netmask 255.255.255.255 gw $orig_gateway
     route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
     # 之后，才能修改改默认路由 (default route)
-    route del -net default
-    route add -net default dev ppp0 || echo "Error: add ppp0 as default route failed!" # 所有网路请求，默认使用 ppp0 口
-
+    route del -net default || echo "Error! orig default gateway not found!"
+    route add -net default dev ppp0
+    if [ $? == 0 ]; then
+        echo "add ppp0 as default route done!"
+    else
+        route add -net default gw $orig_gateway
+        echo "Error! add ppp0 failed! recover origin gateway done!"
+    fi
     # 最后，添加校内路由表
-    route add -net 58.192.114.8  netmask 255.255.255.255 gw $orig_gateway
-    route add -net 10.0.0.0      netmask 255.0.0.0       gw $orig_gateway
-    route add -net 58.192.112.0  netmask 255.255.240.0   gw $orig_gateway
-    route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
-    route add -net 121.229.0.0   netmask 255.255.0.0     gw $orig_gateway
-    route add -net 121.248.48.0  netmask 255.255.240.0   gw $orig_gateway
-    route add -net 202.119.24.55 netmask 255.255.255.255 gw $orig_gateway
-    route add -net 211.65.32.0   netmask 255.255.224.0   gw $orig_gateway
-    route add -net 211.65.232.0  netmask 255.255.252.0   gw $orig_gateway
+    route add -net 58.192.114.8  netmask 255.255.255.255 gw $orig_gateway 2> /dev/null
+    route add -net 10.0.0.0      netmask 255.0.0.0       gw $orig_gateway 2> /dev/null
+    route add -net 58.192.112.0  netmask 255.255.240.0   gw $orig_gateway 2> /dev/null
+    route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway 2> /dev/null
+    route add -net 121.229.0.0   netmask 255.255.0.0     gw $orig_gateway 2> /dev/null
+    route add -net 121.248.48.0  netmask 255.255.240.0   gw $orig_gateway 2> /dev/null
+    route add -net 202.119.24.55 netmask 255.255.255.255 gw $orig_gateway 2> /dev/null
+    route add -net 211.65.32.0   netmask 255.255.224.0   gw $orig_gateway 2> /dev/null
+    route add -net 211.65.232.0  netmask 255.255.252.0   gw $orig_gateway 2> /dev/null
 
-    echo "Updating route table done!"
+    echo "updating route table done!"
 }
 
 start()
@@ -78,7 +83,7 @@ start()
         echo "xl2tpd is running!"
         echo 'c bras' > $xl2tpd_run_dir/l2tp-control
     else
-        echo 'Error: xl2tpd not running!'
+        echo 'Error! xl2tpd not running!'
         exit 255
     fi
 
@@ -88,7 +93,7 @@ start()
         echo "ppp0 is running!"
         update_route_table
     else
-        echo "Error: xl2tpd is running , but ppp start failed!"
+        echo "Error! xl2tpd is running , but ppp start failed!"
         exit 255
     fi
     # baidu.com 与 GFW 同在
