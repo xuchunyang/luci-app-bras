@@ -11,9 +11,12 @@ m = Map("bras", translate("Bras Connection"))
 s = m:section(TypedSection, "bras")
 s.anonymous = true
 
-s:option(Value, "username", translate("Username"))
+un = s:option(Value, "username", translate("Username"))
+un.default=luci.util.exec("uci get bras.@bras[0].username")
+
 pw = s:option(Value, "password", translate("Password"))
 pw.password = true
+pw.default=luci.util.exec("uci get bras.@bras[0].password")
 
 local pid = luci.util.exec("/usr/bin/pgrep xl2tpd")
 local pppd_pid = luci.util.exec("/usr/bin/pgrep pppd")

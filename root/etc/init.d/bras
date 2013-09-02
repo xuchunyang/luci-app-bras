@@ -25,7 +25,7 @@ create_bras_conf() {
     sed -e "s#|USERNAME|#$username#g" \
         /etc/xl2tpd/xl2tpd.conf.template > $xl2tpd_config_file
 
-    [ -f /etc/ppp/options.bras.xl2tpd ] || echo "Error, ppp-opt filecopied failed!"
+    [ -f /etc/ppp/options.bras.xl2tpd ] || echo "Error, $ppp_option_file not found!"
 
     sed -e "s#|USERNAME|#$username#g" \
         -e "s#|PASSWORD|#$password#g" \

@@ -1,4 +1,3 @@
 config 'bras'
-       option gateway 'bras.seu.edu.cn'
        option username '213110110@a'
        option password '123456'
