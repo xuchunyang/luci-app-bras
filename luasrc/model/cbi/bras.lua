@@ -2,18 +2,18 @@
    LuCI-app-Bras
    Maintainer: xcy <xuchunyang56@gmail.com>
 ]]--
+-- TODO: 调整提示信息
 
 require("luci.tools.webadmin")
 
-m = Map("bras", translate("Bras"))
+m = Map("bras", translate("Bras Connection"))
 
-s = m:section(TypedSection, "bras", translate("Connect to Bras"))
+s = m:section(TypedSection, "bras")
 s.anonymous = true
 
-s:option(Value, "username", translate("Username")).default="213110213@a"
+s:option(Value, "username", translate("Username"))
 pw = s:option(Value, "password", translate("Password"))
 pw.password = true
-pw.default = "123456"
 
 local pid = luci.util.exec("/usr/bin/pgrep xl2tpd")
 local pppd_pid = luci.util.exec("/usr/bin/pgrep pppd")
@@ -24,6 +24,8 @@ function bras_process_status()
 
    if pid ~= "" then
       status = "xl2tpd is running with the PID " .. pid .. "and "
+   else
+      status = 'Error xl2tpd is not running, Bras failed!'
    end
    if nixio.fs.access("/etc/rc.d/60bras") then
       status = status .. "it's enabled on the startup"
@@ -32,7 +34,9 @@ function bras_process_status()
    end
 
    if pppd_pid ~= "" then
-      status = "pppd is running!"
+      status = "Connected to Bras!"
+   else
+      status = "pppd is not running, Bras failed! "
    end
    local status = { status=status, message=message }
    local table = { pid=status }
