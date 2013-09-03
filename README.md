@@ -43,33 +43,25 @@ luci-app-Bras
 ----
 需要强调的是 `luci-app-Ｂras`只是 [xl2tpd][5] 的一个前端，另外我在写 `luci-app-Bras` 的过程中参考了 [luci-app-vpnc][6] 项目。
 如果你在使用中遇到了问题，可以使用 `OpenWrt` 提供的 `uci` 工具查看或者修改配置。
+
 1. 打印用户名密码和初始网关
-```
-uci show bras
-```
-```
-cat /tmp/ORIG_GATEWAY
-```
+   ```
+   uci show bras
+   cat /tmp/ORIG_GATEWAY
+   ```
+
 2. 修改信息，并写入文件
-```
-uci set bras.@bras[0].username=213110678@b
-```
-```
-uci set bras.@bras[0].password=123456
-```
-```
-echo "your original" > /tmp/ORIG_GATEWAY
-```
-```
-set commit bras
-```
+   ```
+   uci set bras.@bras[0].username=213110678@b
+   uci set bras.@bras[0].password=123456
+   echo "your original" > /tmp/ORIG_GATEWAY
+   set commit bras
+   ```
 3. 启动和停止
-```
-/etc/init.d/bras start
-```
-```
-/etc/init.d/bras stop
-```
+   ```
+   /etc/init.d/bras start
+   /etc/init.d/bras stop
+   ```
 
 另外如果你在使用中遇到了问题，可以到 [SBBS][4] 的 Linux 版提问。
 
@@ -78,3 +70,4 @@ set commit bras
 [3]: http://www.netsarang.com/products/xsh_overview.html
 [4]: http://bbs.seu.edu.cn
 [5]: https://github.com/xelerance/xl2tpd
+[6]: https://github.com/tombatossals/luci-app-vpnc‎
