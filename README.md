@@ -46,22 +46,32 @@ luci-app-Bras
 1. 打印用户名密码和初始网关
 ```
 uci show bras
+```
+```
 cat /tmp/ORIG_GATEWAY
 ```
 2. 修改信息，并写入文件
 ```
 uci set bras.@bras[0].username=213110678@b
+```
+```
 uci set bras.@bras[0].password=123456
+```
+```
 echo "your original" > /tmp/ORIG_GATEWAY
+```
+```
 set commit bras
 ```
 3. 启动和停止
 ```
 /etc/init.d/bras start
+```
+```
 /etc/init.d/bras stop
 ```
 
-另外如果使用中遇到了问题，可以到 [SBBS][4] 的 Linux 版提问。
+另外如果你在使用中遇到了问题，可以到 [SBBS][4] 的 Linux 版提问。
 
 [1]: http://en.wikipedia.org/wiki/Lua
 [2]: http://www.chiark.greenend.org.uk/~sgtatham/putty/
