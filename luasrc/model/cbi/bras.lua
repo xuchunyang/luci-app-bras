@@ -22,7 +22,7 @@ local pid = luci.util.exec("/usr/bin/pgrep xl2tpd")
 local pppd_pid = luci.util.exec("/usr/bin/pgrep pppd")
 local message = luci.http.formvalue("message")
 
-function bras_process_status()
+function bras_process_status()  -- TODO: 提示信息无法打印完全  与/etc/init.d/bras 冲突
    local status = "xl2tpd is not running now and "
 
    if pid ~= "" then
@@ -39,7 +39,7 @@ function bras_process_status()
    if pppd_pid ~= "" then
       status = "Connected to Bras!"
    else
-      status = "pppd is not running, Bras does not start!"
+      status = "pppd is not running, Bras does not start!" -- TODO: 提示信息不友好
    end
    local status = { status=status, message=message }
    local table = { pid=status }
@@ -77,7 +77,7 @@ else
    end
 end
 
-if nixio.fs.access("/etc/rc.d/S60bras") then
+if nixio.fs.access("/etc/rc.d/S60bras") then -- TODO: 开机自动启动需要确认能上 校内， 可重复多次，等待 PPPoE 拨号完成
    disable = t:option(Button, "_disable", translate("Disable from startup"))
    disable.inputstyle = "remove"
    function disable.write(self, section)

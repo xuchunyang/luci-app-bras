@@ -105,5 +105,6 @@ stop()
     echo "Killing xl2tpd..."
     pkill -9 xl2tpd && echo "xl2tpd is killed!"
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
+    # TODO: clean all necessary route table!
     route add -net default gw $orig_gateway && echo "Recovering default route done!"
 }
