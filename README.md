@@ -47,11 +47,7 @@ cd /path/to/luci-bras-app-master
    /etc/init.d/bras start
    /etc/init.d/bras stop
   ```
-同时你也可以到 [SBBS][4] 的 Linux 版发帖提问。另外，我在写`luci-app-bras`的过程中参考了 [luci-app-vpnc][6] 项目，从中的得到了很多启发。
+同时你也可以到 [SBBS][1] 的 Linux 版发帖提问。另外，我在写`luci-app-bras`的过程中参考了 [luci-app-vpnc][2] 项目，从中的得到了很多启发。
 
-[1]: http://en.wikipedia.org/wiki/Lua
-[2]: http://www.chiark.greenend.org.uk/~sgtatham/putty/
-[3]: http://www.netsarang.com/products/xsh_overview.html
-[4]: http://bbs.seu.edu.cn
-[5]: https://github.com/xelerance/xl2tpd
-[6]: https://github.com/tombatossals/luci-app-vpnc‎
+[1]: http://bbs.seu.edu.cn
+[2]: https://github.com/tombatossals/luci-app-vpnc
