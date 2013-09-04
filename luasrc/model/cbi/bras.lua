@@ -2,7 +2,6 @@
    LuCI-app-Bras
    Maintainer: xcy <xuchunyang56@gmail.com>
 ]]--
--- TODO: 调整提示信息
 
 require("luci.tools.webadmin")
 
@@ -20,28 +19,16 @@ pw.default=luci.util.exec("uci get bras.@bras[0].password")
 
 local pid = luci.util.exec("/usr/bin/pgrep xl2tpd")
 local pppd_pid = luci.util.exec("/usr/bin/pgrep pppd")
-local message = luci.http.formvalue("message")
 
-function bras_process_status()  -- TODO: 提示信息无法打印完全  与/etc/init.d/bras 冲突
-   local status = "xl2tpd is not running now and "
-
-   if pid ~= "" then
-      status = "xl2tpd is running with the PID " .. pid .. "and "
-   else
-      status = 'xl2tpd is not running, Bras does not start!'
-   end
-   if nixio.fs.access("/etc/rc.d/60bras") then
-      status = status .. "it's enabled on the startup"
-   else
-      status = status .. "it's disabled on the startup"
-   end
+function bras_process_status()
+   local status = ""
 
    if pppd_pid ~= "" then
       status = "Connected to Bras!"
    else
-      status = "pppd is not running, Bras does not start!" -- TODO: 提示信息不友好
+      status = "Bras does not start!"
    end
-   local status = { status=status, message=message }
+   local status = { status=status }
    local table = { pid=status }
    return table
 end
@@ -51,18 +38,15 @@ t.anonymous = true
 
 t:option(DummyValue, "status", translate("Bras status"))
 
-if message then
-   t:option(DummyValue, "message", translate("Bras start message"))
-end
 
-if pid == "" then
+if pppd_pid == "" then
    start = t:option(Button, "_start", translate("Start"))
    start.inputstyle = "apply"
    function start.write(self, section)
-      message = luci.util.exec("/etc/init.d/bras start 2>&1")
+      luci.util.exec("/etc/init.d/bras start 2>&1")
       luci.util.exec("sleep 2")
       luci.http.redirect(
-         luci.dispatcher.build_url("admin", "services", "bras") .. "?message=" .. message
+         luci.dispatcher.build_url("admin", "services", "bras")
       )
    end
 else
@@ -77,7 +61,7 @@ else
    end
 end
 
-if nixio.fs.access("/etc/rc.d/S60bras") then -- TODO: 开机自动启动需要确认能上 校内， 可重复多次，等待 PPPoE 拨号完成
+if nixio.fs.access("/etc/rc.d/S60bras") then
    disable = t:option(Button, "_disable", translate("Disable from startup"))
    disable.inputstyle = "remove"
    function disable.write(self, section)

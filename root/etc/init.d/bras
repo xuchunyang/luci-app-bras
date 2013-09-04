@@ -69,13 +69,12 @@ start()
     config_foreach create_bras_conf
 
     # 获取成功连上PPPoE之后、拨Bras之前的网关
-    set $(route -e | grep default) # TODO:使用 awk 或 sed 更自然
-    orig_gateway=$2
+    orig_gateway=`route -e | grep default | sed 's/default *//g' | sed 's/  *.*//g'`
     echo $orig_gateway  > /tmp/ORIG_GATEWAY # Ugly! 保存初始网关
 
     echo "starting xl2tpd..."
     [ -d $xl2tpd_run_dir ] || mkdir -p $xl2tpd_run_dir
-    xl2tpd -c $xl2tpd_config_file
+    pidof xl2tpd || xl2tpd -c $xl2tpd_config_file
     sleep 1
 
     pgrep xl2tpd > /dev/null
@@ -96,8 +95,7 @@ start()
         echo "Error! xl2tpd is running , but ppp start failed!"
         exit 255
     fi
-    # baidu.com 与 GFW 同在
-    pint -W1 -c1 baidu.com 2> /dev/null && echo "SUCCEED!" #FIXME: looking for alternative
+    ping -W1 -c1 baidu.com 2> /dev/null && echo "SUCCEED!"
 }
 
 stop()
@@ -105,6 +103,5 @@ stop()
     echo "Killing xl2tpd..."
     pkill -9 xl2tpd && echo "xl2tpd is killed!"
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
-    # TODO: clean all necessary route table!
     route add -net default gw $orig_gateway && echo "Recovering default route done!"
 }
