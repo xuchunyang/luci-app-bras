@@ -1,6 +1,12 @@
 --[[
-   LuCI-app-Bras
-   Maintainer: xcy <xuchunyang56@gmail.com>
+LuCI - Lua Configuration Interface
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
 ]]--
 
 require("luci.tools.webadmin")
@@ -23,10 +29,10 @@ local pppd_pid = luci.util.exec("/usr/bin/pgrep pppd")
 function bras_process_status()
    local status = ""
 
-   if pppd_pid ~= "" then
-      status = "Connected to Bras!"
+   if pid ~= "" then
+      status = "Bras Connected!"
    else
-      status = "Bras does not start!"
+      status = "Bras not start!"
    end
    local status = { status=status }
    local table = { pid=status }
@@ -39,7 +45,7 @@ t.anonymous = true
 t:option(DummyValue, "status", translate("Bras status"))
 
 
-if pppd_pid == "" then
+if pid == "" then
    start = t:option(Button, "_start", translate("Start"))
    start.inputstyle = "apply"
    function start.write(self, section)
