@@ -85,7 +85,7 @@ start()
     # xl2tpd's pppd interface may be ppp1 when your OpenWRT already has ppp interface(e.g pppoe-wan)
     ifconfig ppp0 &> /dev/null
     ppp0_status=$?
-    if [ ppp0_status == 0]; then
+    if [ ppp0_status == 0 ]; then
         echo "ppp0 is running!"
         update_route_table ppp0
     else
@@ -106,6 +106,7 @@ start()
         echo "Bras's ppp interface exit!"
     else
         kill -9 `pidof xl2tpd` && echo 'kill xl2tpd done'
+    fi
 
 }
 
