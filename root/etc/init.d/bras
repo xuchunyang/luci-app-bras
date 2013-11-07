@@ -2,7 +2,7 @@
 # LuCI-app-Bras
 # Maintainer: xcy <xuchunyang56@gmail.com>
 
-. /etc/functions.sh
+. /etc/functions.sh             # 导入函数config_*，比如config_get
 
 START=60
 STOP=01
@@ -21,30 +21,35 @@ create_bras_conf() {
     sed -e "s#|USERNAME|#$username#g" \
         /etc/xl2tpd/xl2tpd.conf.template > $xl2tpd_config_file
 
+    [ -f /etc/ppp/options.bras.xl2tpd ] || echo "Error, $ppp_option_file not found!"
+
     sed -e "s#|USERNAME|#$username#g" \
         -e "s#|PASSWORD|#$password#g" \
         /etc/ppp/chap-secrets.template > $ppp_secret_file
 
-    echo "config xl2tpd done!"
+    echo "config xl2tpd complete!"
+
 }
 
 # 在 pppd 不改变路由的情况下 #TODO: 总是这样吗？ 路由表的更新到底受到到哪些因素影响？
 update_route_table() {
-    echo "updating route table..."
+    echo "Updating route table..."
 
-    # route BRAS(bras.seu.edu.cn) first
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
+    # 首先，添加 bras.seu.edu.cn 到 非ppp0 的网络接口。bras.seu.edu.cn 有两
+    # 个IP, 这里本应该添加分配的IP，xl2tpd -D 可以看到是哪个IP
     route add -net 58.192.112.38 netmask 255.255.255.255 gw $orig_gateway
     route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
-
-    route add -net default dev $?
+    # 之后，才能修改改默认路由 (default route)
+    route del -net default || echo "Error! orig default gateway not found!"
+    route add -net default dev ppp0
     if [ $? == 0 ]; then
-        echo "add $? as default route done!"
+        echo "add ppp0 as default route done!"
     else
-        route add -net default gw $orig_gateway && echo "recover original gateway done!"
-        exit 255
+        route add -net default gw $orig_gateway
+        echo "Error! add ppp0 failed! recover origin gateway done!"
     fi
-
+    # 最后，添加校内路由表
     route add -net 58.192.114.8  netmask 255.255.255.255 gw $orig_gateway 2> /dev/null
     route add -net 10.0.0.0      netmask 255.0.0.0       gw $orig_gateway 2> /dev/null
     route add -net 58.192.112.0  netmask 255.255.240.0   gw $orig_gateway 2> /dev/null
@@ -55,7 +60,7 @@ update_route_table() {
     route add -net 211.65.32.0   netmask 255.255.224.0   gw $orig_gateway 2> /dev/null
     route add -net 211.65.232.0  netmask 255.255.252.0   gw $orig_gateway 2> /dev/null
 
-    echo "update route table done!"
+    echo "updating route table done!"
 }
 
 start()
@@ -63,15 +68,16 @@ start()
     config_load bras
     config_foreach create_bras_conf
 
+    # 获取成功连上PPPoE之后、拨Bras之前的网关
     orig_gateway=`route -e | grep default | sed 's/default *//g' | sed 's/  *.*//g'`
-    echo $orig_gateway  > /tmp/ORIG_GATEWAY # save original gateway
+    echo $orig_gateway  > /tmp/ORIG_GATEWAY # Ugly! 保存初始网关
 
     echo "starting xl2tpd..."
     [ -d $xl2tpd_run_dir ] || mkdir -p $xl2tpd_run_dir
     pidof xl2tpd || xl2tpd -c $xl2tpd_config_file
     sleep 1
 
-    pgrep xl2tpd &> /dev/null
+    pgrep xl2tpd > /dev/null
     if [ $? == 0 ]; then
         echo "xl2tpd is running!"
         echo 'c bras' > $xl2tpd_run_dir/l2tp-control
@@ -80,40 +86,22 @@ start()
         exit 255
     fi
 
-    sleep 3
-
-    # xl2tpd's pppd interface may be ppp1 when your OpenWRT already has ppp interface(e.g pppoe-wan)
-    ifconfig ppp0 &> /dev/null
-    ppp0_status=$?
-    if [ ppp0_status == 0 ]; then
+    sleep 4
+    ifconfig ppp0 > /dev/null
+    if [ $? == 0 ]; then
         echo "ppp0 is running!"
-        update_route_table ppp0
+        update_route_table
     else
-        echo "ppp0 does not exist!"
+        echo "Error! xl2tpd is running , but ppp start failed!"
+        exit 255
     fi
-
-    ifconfig ppp1 &> /dev/null
-    ppp1_status=$?
-    if [ ppp1_status == 0 ]; then
-        echo "ppp1 is running!"
-        return 1
-        update_route_table ppp1
-    else
-        echo "ppp1 does not exist!"
-    fi
-
-    if [ ppp0_status == 0 ] || [ ppp1_status == 0 ]; then
-        echo "Bras's ppp interface exit!"
-    else
-        kill -9 `pidof xl2tpd` && echo 'kill xl2tpd done'
-    fi
-
+    ping -W1 -c1 baidu.com 2> /dev/null && echo "SUCCEED!"
 }
 
 stop()
 {
-    echo "killing xl2tpd..."
-    kill -9 xl2tpd && echo "kill xl2tpd done"
+    echo "Killing xl2tpd..."
+    pkill -9 xl2tpd && echo "xl2tpd is killed!"
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
     route add -net default gw $orig_gateway && echo "Recovering default route done!"
 }
