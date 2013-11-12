@@ -1,6 +1,6 @@
 #!/bin/sh
 
-## Note: 如果你打算同时在路由器上拨ipv6test和BRAS，需要uncomment下面两行
+## Note: 如果你打算同时在路由器上拨ipv6test和BRAS，需要 uncomment 下面两行
 # sed -e 's#ppp0#ppp1#g'  ./root/etc/init.d/bras > ./root/etc/config/bras
 # sed -e 's#ppp0#ppp1#g'  ./root/etc/firewall.user > ./root/etc/firewall.user
 

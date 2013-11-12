@@ -5,7 +5,7 @@
 ## 依赖
 本程序依赖于`xl2tpd`，需要自行安装。
 
-## 安装:
+## 安装
     $ git clone https://github.com/XuChunyang/luci-app-bras.git
 
     将luci-app-bras移动到路由器(e.g. 192.168.1.1):
