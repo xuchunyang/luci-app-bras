@@ -1,11 +1,12 @@
 # luci-app-bras
 
-`luci-app-bras`是适用于`OpenWrt`的BRAS服务的Web前端，目前仅支持东南大学BRAS。
+`luci-app-bras`是适用于`OpenWrt`的 BRAS 服务的 Web 前端，目前仅支持东南大学 BRAS。
 
-## 依赖
-本程序依赖于`xl2tpd`，需要自行安装。
+## Dependency
 
-## 安装
+* xl2tpd
+
+## Installation
     $ git clone https://github.com/XuChunyang/luci-app-bras.git
 
     将luci-app-bras移动到路由器(e.g. 192.168.1.1):
@@ -18,11 +19,11 @@
     $ cd /tmp/luci-bras-app
     $ sh install.sh
 
-## 使用
+## Usage
 
-使用浏览器登录路由器，进入 管理界面 -> 服务 -> BRAS，开启/关闭BRAS。
+使用浏览器登录路由器，进入 管理界面 -> 服务 -> BRAS，开启/关闭 BRAS。
 
-## 注意
+## Debug
 
 如果在使用中遇到了问题，可以结合使用`OpenWrt`提供的`uci`工具查看或者修改配置，手动控制BRAS:
 
@@ -42,3 +43,7 @@
 
     $ /etc/init.d/bras start
     $ /etc/init.d/bras stop
+
+## License
+
+`luci-app-bras` is licensed under the [MIT license](https://raw.github.com/soimort/you-get/master/LICENSE.txt).
