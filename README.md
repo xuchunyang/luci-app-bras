@@ -8,7 +8,7 @@
 
 ## Installation
     $ wget https://github.com/xuchunyang/luci-app-bras/releases/download/v0.9-alpha/luci-app-bras_0.1-1_all.ipk
-    $ opkg luci-app-bras_0.1-1_all.ipk
+    $ opkg install luci-app-bras_0.1-1_all.ipk
 
 ## TODO
 - [x] Clean source code
