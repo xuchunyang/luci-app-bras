@@ -2,7 +2,9 @@
 # LuCI-app-Bras
 # Maintainer: Chunyang Xu <xuchunyang56@gmail.com>
 
-# FIXME: Clean debug message, only keey necessary
+# FIXME:
+# 1) Clean debug message (only keey necessary) 2)
+# 2) Try to keep all Condition statement with same style
 
 . /etc/functions.sh             # 导入函数config_*，比如config_get
 
@@ -38,8 +40,8 @@ create_bras_conf() {
 
 # 在 pppd 不改变路由的情况下 #TODO: 总是这样吗？ 路由表的更新到底受到到哪些因素影响？
 update_route_table() {
-    echo "Updating route table..."
-
+    echo "Updating route table defalut PPP: ${PPP}..."
+    # FIXME: how to keep variable outside shell script?
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
     # 首先，添加 bras.seu.edu.cn 到 非ppp 的网络接口。bras.seu.edu.cn 有两
     # 个IP, 这里本应该添加分配的IP，xl2tpd -D 可以看到是哪个IP
@@ -91,10 +93,11 @@ start()
         exit 255
     fi
 
-    sleep 4
+    sleep 2
     # if ppp1 not found, use ppp0
     ifconfig $PPP &> /dev/null | PPP=ppp0
     ifconfig $PPP &> /dev/null
+    echo "ppp = ${PPP}"
     if [ $? == 0 ]; then
         echo "${PPP} is running!"
         update_route_table
@@ -102,13 +105,14 @@ start()
         echo "Error! xl2tpd is running , but ppp start failed!"
         exit 255
     fi
+    # Final connection test
     ping -W1 -c1 baidu.com 2> /dev/null && echo "SUCCEED!"
 }
 
 stop()
 {
     echo "Killing xl2tpd..."
-    pkill -9 xl2tpd && echo "xl2tpd is killed!"
+    ps | grep -ie xl2tpd | grep -v grep | awk '{print $1}' | xargs kill -9
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
     route add -net default gw $orig_gateway && echo "Recovering default route done!"
 }
