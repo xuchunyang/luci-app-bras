@@ -37,10 +37,10 @@ define Package/luci-app-bras/install
 	$(INSTALL_DIR) $(1)/etc/xl2tpd/
 	$(INSTALL_DIR) $(1)/etc/ppp/
 
-# Sample xl2tpd configure
+# Sample xl2tpd configure etc/ppp/options.bras.xl2tpd
 	$(INSTALL_CONF) ./etc/xl2tpd/xl2tpd.conf.template $(1)/etc/xl2tpd/xl2tpd.conf.template
 	$(INSTALL_CONF) ./etc/ppp/chap-secrets.template  $(1)/etc/ppp/chap-secrets.template
-	$(INSTALL_CONF) ./etc/ppp/options.bras.xl2tpd $(1)/etc/xl2tpd/options.bras.xl2tpd
+	$(INSTALL_CONF) ./etc/ppp/options.bras.xl2tpd $(1)/etc/ppp/options.bras.xl2tpd
 	$(INSTALL_CONF) ./etc/config/bras $(1)/etc/config/bras
 	$(INSTALL_BIN) ./etc/init.d/bras $(1)/etc/init.d/bras
 	$(INSTALL_DATA) ./usr/lib/lua/luci/model/cbi/bras.lua $(1)/usr/lib/lua/luci/model/cbi/bras.lua
