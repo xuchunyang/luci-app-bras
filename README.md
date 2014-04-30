@@ -7,19 +7,11 @@
 * xl2tpd
 
 ## Installation
-    $ git clone https://github.com/XuChunyang/luci-app-bras.git
-
-    将luci-app-bras移动到路由器(e.g. 192.168.1.1):
-
-    $ scp luci-app-bras root@192.168.1.1:/tmp
-
-    登录到路由器，安装:
-
-    $ ssh root@192.168.1.1
-    $ cd /tmp/luci-bras-app
-    $ sh install.sh
+    $ wget https://github.com/xuchunyang/luci-app-bras/releases/download/v0.9-alpha/luci-app-bras_0.1-1_all.ipk
+    $ opkg luci-app-bras_0.1-1_all.ipk
 
 ## TODO
 - [x] Clean source code
 - [x] Package (no plan for this)
 - [ ] Rewrite README page (maybe a github page, if necessary)
+- [ ] Fix ppp interface problem
