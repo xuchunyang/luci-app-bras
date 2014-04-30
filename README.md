@@ -1,17 +1,20 @@
-# luci-app-bras
+### 关于
 
-`luci-app-bras`是适用于`OpenWrt`的 BRAS 服务的 Web 前端，目前仅支持东南大学 BRAS。
+东南大学Bras OpenWRT路由器客户端。
 
-## Dependency
+### 安装
+```shell
+$ wget https://github.com/xuchunyang/luci-app-bras/releases/download/v0.9-alpha/luci-app-bras_0.1-1_all.ipk
+$ opkg install luci-app-bras_0.1-1_all.ipk
+# Note: xl2tpd 不是安装该包的依赖，也就是说，安装xl2tpd和luci-app-bras的先后顺序没所谓。
+```
 
-* xl2tpd
-
-## Installation
-    $ wget https://github.com/xuchunyang/luci-app-bras/releases/download/v0.9-alpha/luci-app-bras_0.1-1_all.ipk
-    $ opkg install luci-app-bras_0.1-1_all.ipk
-
-## TODO
+### TODO
 - [x] Clean source code
 - [x] Package (no plan for this)
-- [ ] Rewrite README page (maybe a github page, if necessary)
-- [ ] Fix ppp interface problem
+- [x] Rewrite README page (maybe a github page, if necessary)
+- [x] Fix ppp interface problem
+- [ ] Clean messy shell script
+
+### 已知的问题
+参见issue页面
