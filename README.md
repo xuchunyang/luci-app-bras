@@ -22,4 +22,4 @@ $ opkg install luci-app-bras_0.1-1_all.ipk
 - [ ] Tweak Web UI
 
 ### 已知的问题
-参见issue页面
+参见[issue](https://github.com/xuchunyang/luci-app-bras/issues?state=open)页面
