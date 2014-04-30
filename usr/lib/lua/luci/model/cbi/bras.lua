@@ -61,26 +61,4 @@ else
    end
 end
 
-if nixio.fs.access("/etc/rc.d/S60bras") then
-   disable = t:option(Button, "_disable", translate("Disable from startup"))
-   disable.inputstyle = "remove"
-   function disable.write(self, section)
-      luci.util.exec("/etc/init.d/bras disable")
-      luci.util.exec("sleep 1")
-      luci.http.redirect(
-         luci.dispatcher.build_url("admin", "services", "bras")
-      )
-   end
-else
-   enable = t:option(Button, "_enable", translate("Enable on startup"))
-   enable.inputstyle = "apply"
-   function enable.write(self, section)
-      luci.util.exec("/etc/init.d/bras enable")
-      luci.util.exec("sleep 1")
-      luci.http.redirect(
-         luci.dispatcher.build_url("admin", "services", "bras")
-      )
-   end
-end
-
 return m
