@@ -11,8 +11,8 @@ cp ./etc/config/bras /etc/config/
 cp ./etc/init.d/bras /etc/init.d/
 
 # Bras Web Interface
-cp  ctr-bras.lua   /usr/lib/lua/luci/controller/
-cp  model-bras.lua /usr/lib/lua/luci/model/cbi/
+cp  ctr-bras.lua   /usr/lib/lua/luci/controller/bras.lua
+cp  model-bras.lua /usr/lib/lua/luci/model/cbi/bras.lua
 
 # Sample firewall configure
 cp ./etc/firewall.user /etc/
