@@ -20,6 +20,6 @@
     $ sh install.sh
 
 ## TODO
-- [ ] Clean source code
+- [x] Clean source code
 - [ ] Rewrite UI
 - [ ] Rewrite README page (maybe a github page, if necessary)
