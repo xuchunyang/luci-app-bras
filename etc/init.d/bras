@@ -1,6 +1,6 @@
 #!/bin/sh /etc/rc.common
 # LuCI-app-Bras
-# Maintainer: xcy <xuchunyang56@gmail.com>
+# Maintainer: Chunyang Xu <xuchunyang56@gmail.com>
 
 . /etc/functions.sh             # 导入函数config_*，比如config_get
 

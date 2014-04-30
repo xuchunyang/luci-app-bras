@@ -1,6 +1,6 @@
 --[[
    LuCI-app-Bras
-   Maintainer: xcy <xuchunyang56@gmail.com>
+   Maintainer: Chunyang Xu <xuchunyang56@gmail.com>
 ]]--
 
 module("luci.controller.bras", package.seeall)
