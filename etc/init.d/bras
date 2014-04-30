@@ -40,7 +40,7 @@ create_bras_conf() {
 
 # 在 pppd 不改变路由的情况下 #TODO: 总是这样吗？ 路由表的更新到底受到到哪些因素影响？
 update_route_table() {
-    echo "Updating route table defalut PPP: ${PPP}..."
+    echo "Updating route table defalut ${PPP}..."
     # FIXME: how to keep variable outside shell script?
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
     # 首先，添加 bras.seu.edu.cn 到 非ppp 的网络接口。bras.seu.edu.cn 有两
@@ -48,6 +48,8 @@ update_route_table() {
     route add -net 58.192.112.38 netmask 255.255.255.255 gw $orig_gateway
     route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
     # 之后，才能修改改默认路由 (default route)
+    # FIXME: del twice (hardcodeing) to make sure default route is deleted!
+    route del -net default || echo "Error! orig default gateway not found!"
     route del -net default || echo "Error! orig default gateway not found!"
     route add -net default dev $PPP
     if [ $? == 0 ]; then
@@ -93,15 +95,37 @@ start()
         exit 255
     fi
 
-    sleep 2
-    # if ppp1 not found, use ppp0
-    ifconfig $PPP &> /dev/null | PPP=ppp0
-    ifconfig $PPP &> /dev/null
-    echo "ppp = ${PPP}"
+    sleep 4
+    # FIXME: Remove debug code
+    echo "---------------------------"
+    ifconfig ppp0 &> /dev/null
     if [ $? == 0 ]; then
-        echo "${PPP} is running!"
+        echo "find ppp0"
+    else
+        echo "not ppp0"
+    fi
+    ifconfig ppp1 &> /dev/null
+    if [ $? == 0 ]; then
+        echo "find ppp1"
+    else
+        echo "not ppp1"
+    fi
+    echo "---------------------------"
+    # if ppp1 not found, use ppp0
+    ifconfig $PPP &> /dev/null
+    if [ $? != 0 ]; then
+        echo "ppp1 not found, set to ppp0"
+        PPP=ppp0
+    fi
+
+    echo "set ppp interface to ${PPP}"
+
+    ifconfig $PPP &> /dev/null
+    if [ $? == 0 ]; then
+        echo "${PPP} is found!"
         update_route_table
     else
+        echo "${PPP} is not found"
         echo "Error! xl2tpd is running , but ppp start failed!"
         exit 255
     fi
