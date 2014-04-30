@@ -21,7 +21,5 @@
 
 ## TODO
 - [x] Clean source code
-- [ ] Chinese translation
-- [ ] Rewrite UI
+- [x] Package (no plan for this)
 - [ ] Rewrite README page (maybe a github page, if necessary)
-- [ ] Package (no plan for this)
