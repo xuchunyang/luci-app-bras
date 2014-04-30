@@ -7,7 +7,7 @@
 # 1. 安装 xl2tpd
 
 # 2. 安装 luci-app-bras
-$ wget https://github.com/xuchunyang/luci-app-bras/releases/download/v0.9-alpha/luci-app-bras_0.1-1_all.ipk
+$ wget https://github.com/xuchunyang/luci-app-bras/releases/download/v1.0/luci-app-bras_1.0-1_all.ipk
 $ opkg install luci-app-bras_0.1-1_all.ipk
 
 # 3. 添加防火墙转发规则，参见firewall.user
