@@ -5,7 +5,7 @@
 
 require("luci.tools.webadmin")
 
-m = Map("bras", translate("Bras Connection"))
+m = Map("bras", translate("SEU Bras 客户端"))
 
 s = m:section(TypedSection, "bras")
 s.anonymous = true
