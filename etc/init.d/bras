@@ -2,6 +2,8 @@
 # LuCI-app-Bras
 # Maintainer: Chunyang Xu <xuchunyang56@gmail.com>
 
+# FIXME: Clean debug message, only keey necessary
+
 . /etc/functions.sh             # 导入函数config_*，比如config_get
 
 START=60
@@ -12,6 +14,9 @@ xl2tpd_run_dir=/var/run/xl2tpd
 xl2tpd_config_file=/etc/xl2tpd/bras.xl2tpd.conf
 ppp_option_file=/etc/ppp/options.bras.xl2tpd
 ppp_secret_file=/etc/ppp/chap-secrets
+
+# default point-to-point interface created by l2tp
+PPP=ppp1
 
 create_bras_conf() {
     echo "starting config xl2tpd..."
@@ -36,18 +41,18 @@ update_route_table() {
     echo "Updating route table..."
 
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
-    # 首先，添加 bras.seu.edu.cn 到 非ppp0 的网络接口。bras.seu.edu.cn 有两
+    # 首先，添加 bras.seu.edu.cn 到 非ppp 的网络接口。bras.seu.edu.cn 有两
     # 个IP, 这里本应该添加分配的IP，xl2tpd -D 可以看到是哪个IP
     route add -net 58.192.112.38 netmask 255.255.255.255 gw $orig_gateway
     route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
     # 之后，才能修改改默认路由 (default route)
     route del -net default || echo "Error! orig default gateway not found!"
-    route add -net default dev ppp0
+    route add -net default dev $PPP
     if [ $? == 0 ]; then
-        echo "add ppp0 as default route done!"
+        echo "add ${PPP} as default route done!"
     else
         route add -net default gw $orig_gateway
-        echo "Error! add ppp0 failed! recover origin gateway done!"
+        echo "Error! add ${PPP} failed! recover origin gateway done!"
     fi
     # 最后，添加校内路由表
     route add -net 58.192.114.8  netmask 255.255.255.255 gw $orig_gateway 2> /dev/null
@@ -87,9 +92,11 @@ start()
     fi
 
     sleep 4
-    ifconfig ppp0 > /dev/null
+    # if ppp1 not found, use ppp0
+    ifconfig $PPP &> /dev/null | PPP=ppp0
+    ifconfig $PPP &> /dev/null
     if [ $? == 0 ]; then
-        echo "ppp0 is running!"
+        echo "${PPP} is running!"
         update_route_table
     else
         echo "Error! xl2tpd is running , but ppp start failed!"
