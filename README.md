@@ -1,21 +1,25 @@
-### 关于
+## About
 
-东南大学Bras的OpenWRT路由器客户端，主要包括了xl2tpd的配置模板、东南大学校内路由表和Web控制界面。
+[luci-app-bras](https://github.com/xuchunyang/luci-app-bras)是一个东南大学Bras的OpenWRT路由器客户端，主要包括了xl2tpd的配置模板、东南大学校内路由表和Web控制界面。
 
-你可以使用任何设备上的浏览器控制Bras，并且通过利用防火墙转发，任何设备都能同时使用Bras。
+利用该工具，你可以使用浏览器控制Bras，并且通过设置防火墙转发规则，通过WLAN接入的设备能共享Bras。
 
-### 安装
+## Dependency
+
+* xl2tpd
+
+## Installation
+
 ```bash
-# 1. 安装 xl2tpd
-
-# 2. 安装 luci-app-bras
-$ wget https://github.com/xuchunyang/luci-app-bras/releases/download/v1.0/luci-app-bras_1.0-1_all.ipk
+# 1. 安装 luci-app-bras
+# 下载安装包[Releases](https://github.com/xuchunyang/luci-app-bras/releases)
 $ opkg install luci-app-bras_0.1-1_all.ipk
 
-# 3. 添加防火墙转发规则，参见firewall.user
+# 2. 添加防火墙转发规则，参见firewall.user
 ```
 
-### TODO
+## TODO
+
 - [x] Clean source code
 - [x] Package (no plan for this)
 - [x] Rewrite README page (maybe a github page, if necessary)
@@ -23,5 +27,10 @@ $ opkg install luci-app-bras_0.1-1_all.ipk
 - [ ] Clean messy shell script
 - [ ] Tweak Web UI
 
-### 已知的问题
+## Known issues
+
 参见[issue](https://github.com/xuchunyang/luci-app-bras/issues?state=open)页面
+
+## License
+
+luci-app-bras在[MIT license](https://raw.github.com/xuchunyang/luci-app-bras/master/LICENSE.txt)下发布。
