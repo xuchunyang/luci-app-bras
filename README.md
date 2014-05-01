@@ -10,9 +10,10 @@
 
 ## Installation
 
+在[Releases](https://github.com/xuchunyang/luci-app-bras/releases)下在安装包。
+
 ```bash
 # 1. 安装 luci-app-bras
-# 下载安装包[Releases](https://github.com/xuchunyang/luci-app-bras/releases)
 $ opkg install luci-app-bras_0.1-1_all.ipk
 
 # 2. 添加防火墙转发规则，参见firewall.user
