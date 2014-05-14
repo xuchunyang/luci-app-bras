@@ -10,7 +10,7 @@
 
 ## Installation
 
-在[Releases](https://github.com/xuchunyang/luci-app-bras/releases)下在安装包。
+在[Releases](https://github.com/xuchunyang/luci-app-bras/releases)下载安装包。
 
 ```bash
 # 1. 安装 luci-app-bras
