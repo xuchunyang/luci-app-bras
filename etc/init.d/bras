@@ -1,12 +1,12 @@
 #!/bin/sh /etc/rc.common
-# LuCI-app-Bras
-# Maintainer: Chunyang Xu <xuchunyang56@gmail.com>
+# LuCI-app-bras
+# MIT license | Chunyang Xu <http://xuchunyang.me>
 
 # FIXME:
 # 1) Clean debug message (only keey necessary) 2)
 # 2) Try to keep all Condition statement with same style
 
-. /etc/functions.sh             # 导入函数config_*，比如config_get
+. /etc/functions.sh
 
 START=60
 STOP=01
@@ -20,56 +20,52 @@ ppp_secret_file=/etc/ppp/chap-secrets
 # default point-to-point interface created by l2tp
 PPP=ppp1
 
+# Create l2tp configuration files according user/name from web UI
 create_bras_conf() {
-    echo "starting config xl2tpd..."
+    logger -t "bras" "starting configurate xl2tpd"
+
+    if ! [ -f /etc/ppp/options.bras.xl2tpd ]; then
+        logger -s -t "bras" "Error, $ppp_option_file not found!"
+        exit 255
+    fi
+
     config_get username $1 username
     config_get password $1 password
 
     sed -e "s#|USERNAME|#$username#g" \
         /etc/xl2tpd/xl2tpd.conf.template > $xl2tpd_config_file
 
-    [ -f /etc/ppp/options.bras.xl2tpd ] || echo "Error, $ppp_option_file not found!"
-
     sed -e "s#|USERNAME|#$username#g" \
         -e "s#|PASSWORD|#$password#g" \
         /etc/ppp/chap-secrets.template > $ppp_secret_file
 
-    echo "config xl2tpd complete!"
+    logger -t "bras" "configurate xl2tpd done"
 
 }
 
 # 在 pppd 不改变路由的情况下 #TODO: 总是这样吗？ 路由表的更新到底受到到哪些因素影响？
 update_route_table() {
-    echo "Updating route table defalut ${PPP}..."
+    logger -t "bras"  "Updating route table"
     # FIXME: how to keep variable outside shell script?
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
-    # 首先，添加 bras.seu.edu.cn 到 非ppp 的网络接口。bras.seu.edu.cn 有两
-    # 个IP, 这里本应该添加分配的IP，xl2tpd -D 可以看到是哪个IP
+
+    # Add bras route first
     route add -net 58.192.112.38 netmask 255.255.255.255 gw $orig_gateway
     route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway
-    # 之后，才能修改改默认路由 (default route)
-    # FIXME: del twice (hardcodeing) to make sure default route is deleted!
-    route del -net default || echo "Error! orig default gateway not found!"
-    route del -net default || echo "Error! orig default gateway not found!"
-    route add -net default dev $PPP
-    if [ $? == 0 ]; then
-        echo "add ${PPP} as default route done!"
+
+    # Fix route after pppd
+    if (route del -net default && route add -net default dev $PPP); then
+        logger -t "bras" "add ${PPP} as default route done"
     else
         route add -net default gw $orig_gateway
-        echo "Error! add ${PPP} failed! recover origin gateway done!"
+        logger -s -t "bras" "Error! add ${PPP} failed! recover origin gateway done"
+        exit 255
     fi
-    # 最后，添加校内路由表
-    route add -net 58.192.114.8  netmask 255.255.255.255 gw $orig_gateway 2> /dev/null
-    route add -net 10.0.0.0      netmask 255.0.0.0       gw $orig_gateway 2> /dev/null
-    route add -net 58.192.112.0  netmask 255.255.240.0   gw $orig_gateway 2> /dev/null
-    route add -net 58.192.112.39 netmask 255.255.255.255 gw $orig_gateway 2> /dev/null
-    route add -net 121.229.0.0   netmask 255.255.0.0     gw $orig_gateway 2> /dev/null
-    route add -net 121.248.48.0  netmask 255.255.240.0   gw $orig_gateway 2> /dev/null
-    route add -net 202.119.24.55 netmask 255.255.255.255 gw $orig_gateway 2> /dev/null
-    route add -net 211.65.32.0   netmask 255.255.224.0   gw $orig_gateway 2> /dev/null
-    route add -net 211.65.232.0  netmask 255.255.252.0   gw $orig_gateway 2> /dev/null
 
-    echo "updating route table done!"
+    # 最后，添加校内路由表
+    /usr/bin/add-seu-route.sh $orig_gateway
+
+    logger -t "bras" "updating route table done"
 }
 
 start()
@@ -77,66 +73,50 @@ start()
     config_load bras
     config_foreach create_bras_conf
 
-    # 获取成功连上PPPoE之后、拨Bras之前的网关
+    # save orginal gateway
+    # 获取成功连上 PPPoE 之后、拨 Bras 之前的网关
     orig_gateway=`route -e | grep default | sed 's/default *//g' | sed 's/  *.*//g'`
     echo $orig_gateway  > /tmp/ORIG_GATEWAY # Ugly! 保存初始网关
 
-    echo "starting xl2tpd..."
+    logger -t "bras" "starting xl2tpd"
     [ -d $xl2tpd_run_dir ] || mkdir -p $xl2tpd_run_dir
     pidof xl2tpd || xl2tpd -c $xl2tpd_config_file
-    sleep 1
+    sleep 1                     # FIXME not sure is it necessary?
 
-    pgrep xl2tpd > /dev/null
-    if [ $? == 0 ]; then
-        echo "xl2tpd is running!"
+    if pidof xl2tpd > /dev/null; then
+        logger -t "bras" "xl2tpd is running!"
         echo 'c bras' > $xl2tpd_run_dir/l2tp-control
     else
-        echo 'Error! xl2tpd not running!'
+        logger -s -t "bras" "Error: xl2tpd start failed"
         exit 255
     fi
 
-    sleep 4
-    # FIXME: Remove debug code
-    echo "---------------------------"
-    ifconfig ppp0 &> /dev/null
-    if [ $? == 0 ]; then
-        echo "find ppp0"
-    else
-        echo "not ppp0"
-    fi
-    ifconfig ppp1 &> /dev/null
-    if [ $? == 0 ]; then
-        echo "find ppp1"
-    else
-        echo "not ppp1"
-    fi
-    echo "---------------------------"
+    sleep 3
     # if ppp1 not found, use ppp0
-    ifconfig $PPP &> /dev/null
-    if [ $? != 0 ]; then
-        echo "ppp1 not found, set to ppp0"
+    if ifconfig ppp2 &> /dev/null; then
+        PPP=ppp2
+    elif ifconfig ppp1 &> /dev/null; then
+        PPP=ppp1
+    elif ifconfig ppp9 &> /dev/null; then
         PPP=ppp0
-    fi
-
-    echo "set ppp interface to ${PPP}"
-
-    ifconfig $PPP &> /dev/null
-    if [ $? == 0 ]; then
-        echo "${PPP} is found!"
-        update_route_table
     else
-        echo "${PPP} is not found"
-        echo "Error! xl2tpd is running , but ppp start failed!"
+        logger -s -t "bras" "Error: no ppp interface found"
         exit 255
     fi
-    # Final connection test
-    ping -W1 -c1 baidu.com 2> /dev/null && echo "SUCCEED!"
+
+    # update default route and SEU route
+    update_route_table
+
+    # check final connection
+    if ping -W1 -c1 baidu.com 2> /dev/null; then
+        logger -t "bras"  "bras connection Succeed"
+    fi
 }
 
 stop()
 {
-    echo "Killing xl2tpd..."
+    logger -t "bras" "Killing xl2tpd"
     ps | grep -ie xl2tpd | grep -v grep | awk '{print $1}' | xargs kill -9
     orig_gateway=`cat /tmp/ORIG_GATEWAY`
-    route add -net default gw $orig_gateway && echo "Recovering default route done!"
+    route add -net default gw $orig_gateway && logger -t "bras" "Recovering default route done"
 }
