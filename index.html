@@ -1,83 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Luci-app-bras : 东南大学Bras OpenWRT路由器客户端">
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen">
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+  <title>Luci-app-bras</title>
+  <meta name="description" content="东南大学Bras OpenWRT路由器客户端">
 
-    <title>Luci-app-bras</title>
-  </head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <body>
+</head>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/xuchunyang/luci-app-bras">View on GitHub</a>
+<body>
 
-          <h1 id="project_title">Luci-app-bras</h1>
-          <h2 id="project_tagline">东南大学Bras OpenWRT路由器客户端</h2>
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Luci-app-bras</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">东南大学Bras OpenWRT路由器客户端</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/xuchunyang/luci-app-bras/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/xuchunyang/luci-app-bras/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/xuchunyang/luci-app-bras" class="code">View Luci-app-bras on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h2>
+<a id="about" class="anchor" href="#about" aria-hidden="true"><span class="octicon octicon-link"></span></a>About</h2>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/xuchunyang/luci-app-bras/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/xuchunyang/luci-app-bras/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h2>
-<a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About</h2>
-
-<p><a href="https://github.com/xuchunyang/luci-app-bras">luci-app-bras</a> 是东南大学 Bras 的 OpenWRT 客户端。</p>
+<p>Southeast University BRAS interface for OpenWRT</p>
 
 <h2>
-<a name="dependency" class="anchor" href="#dependency"><span class="octicon octicon-link"></span></a>Dependency</h2>
+<a id="dependency" class="anchor" href="#dependency" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependency</h2>
 
 <ul>
 <li>xl2tpd</li>
-</ul><h2>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
-
-<p>在 <a href="https://github.com/xuchunyang/luci-app-bras/releases">Releases</a> 下载安装包</p>
-
-<div class="highlight highlight-bash"><pre><span class="c"># 1. 安装 luci-app-bras</span>
-<span class="nv">$ </span>opkg install luci-app-bras_0.1-1_all.ipk
-
-<span class="c"># 2. 添加防火墙转发规则，参见firewall.user</span>
-</pre></div>
+</ul>
 
 <h2>
-<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<ul>
-<li>[x] Clean source code</li>
-<li>[x] Package (no plan for this)</li>
-<li>[x] Rewrite README page (maybe a github page, if necessary)</li>
-<li>[x] Fix ppp interface problem</li>
-<li>[ ] Clean messy shell script</li>
-<li>[ ] Tweak Web UI</li>
-</ul><h2>
-<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+<ol>
+<li>Clone this repo</li>
+<li>Change the route IP in <code>etc/firewall.user</code> to yours (the default is <em>192.168.1.0</em>)</li>
+<li>Copy this repo directory to your openWRT</li>
+<li>Login your openWRT and <code>cd</code> to the directory to run <code>sh ./install.sh</code>
+</li>
+</ol>
 
-<p>luci-app-bras 在 <a href="https://raw.github.com/xuchunyang/luci-app-bras/master/LICENSE.txt">MIT license</a> 下发布。</p>
-      </section>
+<p>Now, you can manage your bras using LUCI.</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p><a href="https://raw.github.com/xuchunyang/luci-app-bras/master/LICENSE.txt">MIT license</a></p>
+        </article>
+      </div>
     </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/xuchunyang" class="avatar"><img src="https://avatars1.githubusercontent.com/u/4550353?v=3&amp;s=60" width="48" height="48"></a> <a href="https://github.com/xuchunyang">xuchunyang</a> maintains <a href="https://github.com/xuchunyang/luci-app-bras">Luci-app-bras</a></p>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Luci-app-bras maintained by <a href="https://github.com/xuchunyang">xuchunyang</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
 
-              <script type="text/javascript">
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="http://pages.github.com/">GitHub Pages</a><br>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/xuchunyang/luci-app-bras/tarball/master" class="tar">tar</a><a href="https://github.com/xuchunyang/luci-app-bras/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -88,6 +96,5 @@
             } catch(err) {}
           </script>
 
-
-  </body>
+</body>
 </html>
